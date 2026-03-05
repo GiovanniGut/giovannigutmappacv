@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I punti di svolta — Giovanni Gut</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --indaco: #5C4FE8; --rosso: #E53935; --abisso: #1A1A2E;
+            --grafite: #3D3D56; --cenere: #8888A0; --sabbia: #E8E4DD;
+            --avorio: #F5F0EB; --avorio-warm: #F8F5F0; --bianco: #FFFFFF;
+            --font-title: 'Playfair Display', serif;
+            --font-ui: 'Inter', sans-serif;
+        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-ui); background: var(--avorio-warm);
+            color: var(--grafite); padding: 40px 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+
+        /* ===== JOURNEY MAP ===== */
+        .jm-container { position: relative; }
+        .jm-intro {
+            font-family: var(--font-title); font-size: 15px; font-style: italic;
+            color: var(--cenere); margin-bottom: 40px; line-height: 1.6; max-width: 480px;
+        }
+        .jm-map { position: relative; }
+        .jm-label {
+            position: absolute; width: 42%;
+            opacity: 0; transform: translateY(8px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            cursor: default; padding-bottom: 16px;
+        }
+        .jm-label.visible { opacity: 1; transform: translateY(0); }
+        .jm-label--left { left: 0; text-align: right; }
+        .jm-label--right { right: 0; text-align: left; }
+        .jm-label-top {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 3px;
+        }
+        .jm-label--left .jm-label-top { justify-content: flex-end; }
+        .jm-label--right .jm-label-top { justify-content: flex-start; }
+        .jm-year {
+            font-family: var(--font-ui); font-size: 10px; font-weight: 700;
+            letter-spacing: 1.5px; color: var(--cenere); transition: color 0.3s;
+        }
+        .jm-world {
+            font-family: var(--font-ui); font-size: 8px; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 2px 7px; border-radius: 2px; transition: all 0.3s;
+        }
+        .jm-title {
+            font-family: var(--font-title); font-size: 16px; font-weight: 700;
+            color: var(--grafite); line-height: 1.25; transition: color 0.3s;
+            letter-spacing: -0.01em;
+        }
+        .jm-sub {
+            font-family: var(--font-ui); font-size: 11.5px; color: var(--cenere);
+            margin-top: 2px; opacity: 0.5; transition: opacity 0.3s; line-height: 1.3;
+        }
+        .jm-shift {
+            font-family: var(--font-title); font-size: 13px; font-style: italic;
+            color: var(--rosso); margin-top: 8px; max-height: 0; opacity: 0;
+            overflow: hidden; transition: all 0.4s ease; line-height: 1.45;
+        }
+        .jm-label.hovered .jm-year { color: inherit; }
+        .jm-label.hovered .jm-world { background-color: currentColor; }
+        .jm-label.hovered .jm-title { color: var(--abisso); }
+        .jm-label.hovered .jm-sub { opacity: 0.85; }
+        .jm-label.hovered .jm-shift { max-height: 60px; opacity: 0.6; }
+        .jm-hitbox {
+            position: absolute; width: 40px; height: 40px;
+            cursor: pointer; z-index: 10;
+        }
+        .jm-footer {
+            padding-top: 24px; border-top: 1px solid var(--sabbia);
+        }
+        .jm-footer-row {
+            display: flex; justify-content: space-between; align-items: baseline;
+            margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+        }
+        .jm-stat {
+            font-family: var(--font-ui); font-size: 10px; font-weight: 600;
+            letter-spacing: 1.5px; color: var(--cenere); text-transform: uppercase;
+        }
+        .jm-tagline {
+            font-family: var(--font-title); font-size: 13px; font-style: italic;
+            color: var(--cenere);
+        }
+        .jm-footer-text {
+            font-family: var(--font-ui); font-size: 12px; color: var(--cenere);
+            line-height: 1.6; margin: 0; opacity: 0.55;
+        }
+        @media (max-width: 640px) {
+            .jm-label { width: 40%; }
+            .jm-title { font-size: 14px; }
+            .jm-sub { font-size: 10.5px; }
+            .jm-shift { font-size: 12px; }
+        }
+        @media (max-width: 480px) {
+            .jm-label {
+                width: 60% !important;
+                right: 0 !important; left: auto !important;
+                text-align: left !important;
+            }
+            .jm-label--left { text-align: left !important; }
+            .jm-label--left .jm-label-top { justify-content: flex-start !important; }
+            .jm-title { font-size: 14px; }
+            .jm-sub { font-size: 10.5px; }
+            .jm-shift { font-size: 12px; }
+        }
+        .jm-hint {
+            font-family: var(--font-ui); font-size: 11px; font-style: italic;
+            color: var(--rosso); margin-bottom: 32px; opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="journey-container" class="jm-container"></div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const jmStops = [
+            { year:"1999", world:"Diplomazia", label:"ONU — Santa Sede", sub:"Advisor a New York, a 22 anni", shift:"Primo giorno di lavoro: l'Assemblea Generale delle Nazioni Unite" },
+            { year:"2001", world:"Accademia", label:"Laurea in Scienze Politiche", sub:"Università di Firenze", shift:"Dove le idee incontrano le istituzioni" },
+            { year:"2004", world:"Management", label:"Master HR", sub:"Ernst & Young Business School", shift:"Imparare a parlare la lingua di chi decide" },
+            { year:"2005", world:"Terzo settore", label:"MCL — Movimento Cristiano Lavoratori", sub:"Leadership nazionale · fino alla Vicepresidenza", shift:"Dalla teoria alla costruzione di reti vere, con persone vere" },
+            { year:"2007", world:"Europa", label:"Conferenze internazionali", sub:"EZA · Varsavia, Porto, Bruxelles", shift:"Tre lingue, cinque paesi, un tavolo" },
+            { year:"2009", world:"Formazione", label:"Formatore — Università Cattolica", sub:"15 edizioni di alta formazione", shift:"Da dirigente a chi forma altri dirigenti" },
+            { year:"2010", world:"Ricerca", label:"PhD Economia del Lavoro", sub:"Fondazione Marco Biagi, Modena", shift:"Dall'azione al pensiero sistematico su quello che fai" },
+            { year:"2010", world:"Letteratura", label:"Primo libro di poesia", sub:"Senza mai fermarsi", shift:"Stesso anno del PhD. La stessa persona, due lingue che escono insieme" },
+            { year:"2020", world:"Voce", label:"Podcast", sub:"3 format · 50+ episodi", shift:"Dalla parola scritta alla parola detta" },
+            { year:"2022", world:"Educazione", label:"Direzione scolastica", sub:"Istituto San Giuseppe, Verona", shift:"Tutto il bagaglio in un posto dove nessuno può restare indietro" },
+            { year:"2024", world:"AI + Musica", label:"The Neural Gut Project", sub:"Poesia + AI + musica", shift:"La macchina diventa interlocutore. Nasce un modo nuovo di creare" },
+            { year:"2025", world:"Coaching", label:"Coach ICF-AICP", sub:"Professional Coaching Program", shift:"Venticinque anni di pratica trovano un nome e un metodo" },
+            { year:"2026", world:"Coaching", label:"AI Trainer · Ricercatore", sub:"Fondazione Tarantelli · Freelance", shift:"Il viaggio continua. Tre fronti aperti, una mappa" },
+        ];
+        const jmColors = {
+            "Diplomazia":"#9B8A4A","Accademia":"#5A6B8B","Management":"#6E8B5A",
+            "Terzo settore":"#5A8B6E","Europa":"#5A8B8B","Formazione":"#8B7A5A",
+            "Ricerca":"#5A6B8B","Letteratura":"#8B5A7B","Voce":"#7B5A8B",
+            "Educazione":"#8B7A5A","AI + Musica":"#5A8B8B","Coaching":"#5C4FE8"
+        };
+        const container = document.getElementById('journey-container');
+        if (!container) return;
+        let hoveredIdx = null;
+        let labels = [], hitboxes = [], circles = [], glows = [], inners = [];
+        let svgEl = null, pathAnim = null;
+
+        function calcPositions(w) {
+            const mobile = w < 480;
+            const cx = mobile ? w * 0.18 : w * 0.5;
+            const amp = mobile ? w * 0.06 : w * 0.12;
+            const rowH = mobile ? 105 : 115;
+            const startY = 30;
+            return jmStops.map((_, i) => {
+                const ph = i * 0.85;
+                return {
+                    x: cx + Math.sin(ph) * amp + Math.cos(ph * 0.6) * (amp * 0.3),
+                    y: startY + i * rowH
+                };
+            });
+        }
+
+        function buildPath(positions) {
+            let d = 'M ' + positions[0].x + ' ' + positions[0].y;
+            for (let i = 1; i < positions.length; i++) {
+                const prev = positions[i-1], curr = positions[i];
+                const midY = prev.y + (curr.y - prev.y) * 0.5;
+                d += ' C ' + prev.x + ',' + midY + ' ' + curr.x + ',' + midY + ' ' + curr.x + ',' + curr.y;
+            }
+            return d;
+        }
+
+        function pathLength(positions) {
+            let len = 0;
+            for (let i = 1; i < positions.length; i++) {
+                const p = positions[i-1], c = positions[i];
+                len += Math.sqrt((c.x - p.x) ** 2 + (c.y - p.y) ** 2);
+            }
+            return len * 1.4;
+        }
+
+        function setHover(idx) {
+            if (hoveredIdx !== null && hoveredIdx !== idx) {
+                labels[hoveredIdx].classList.remove('hovered');
+                updateDot(hoveredIdx, false);
+            }
+            if (idx !== null) {
+                labels[idx].classList.add('hovered');
+                updateDot(idx, true);
+            }
+            hoveredIdx = idx;
+        }
+
+        function updateDot(i, on) {
+            const col = jmColors[jmStops[i].world];
+            circles[i].setAttribute('r', on ? '7' : '5');
+            circles[i].setAttribute('fill', on ? col : '#F8F5F0');
+            circles[i].setAttribute('stroke-width', on ? '2.5' : '1.5');
+            circles[i].style.filter = on ? 'drop-shadow(0 0 6px ' + col + '44)' : 'none';
+            glows[i].setAttribute('r', on ? '16' : '0');
+            glows[i].setAttribute('stroke-opacity', on ? '0.2' : '0');
+            inners[i].setAttribute('r', on ? '2.5' : '0');
+            inners[i].setAttribute('fill-opacity', on ? '1' : '0');
+        }
+
+        function render(animate) {
+            const w = container.offsetWidth;
+            if (w < 1) return;
+            const positions = calcPositions(w);
+            const cx = w * 0.5;
+            const totalH = positions[positions.length - 1].y + 80;
+            const d = buildPath(positions);
+            const pLen = pathLength(positions);
+
+            // Clear
+            container.innerHTML = '';
+            labels = []; hitboxes = []; circles = []; glows = []; inners = [];
+
+            // Intro
+            const intro = document.createElement('p');
+            intro.className = 'jm-intro';
+            intro.textContent = 'Ogni percorso ha i suoi punti di svolta. Trovarli è il primo passo per capire dove stai andando.';
+            container.appendChild(intro);
+
+            // Hint
+            const hint = document.createElement('p');
+            hint.className = 'jm-hint';
+            hint.textContent = w < 480
+                ? 'Tocca una tappa per scoprire i punti di svolta'
+                : 'Passa sopra le tappe per scoprire i punti di svolta';
+            container.appendChild(hint);
+
+            // Map wrapper
+            const mapDiv = document.createElement('div');
+            mapDiv.className = 'jm-map';
+            mapDiv.style.height = totalH + 'px';
+            container.appendChild(mapDiv);
+
+            // SVG
+            const ns = 'http://www.w3.org/2000/svg';
+            svgEl = document.createElementNS(ns, 'svg');
+            svgEl.setAttribute('width', '100%');
+            svgEl.setAttribute('height', totalH);
+            svgEl.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;overflow:visible;';
+            mapDiv.appendChild(svgEl);
+
+            // Ghost path
+            const ghost = document.createElementNS(ns, 'path');
+            ghost.setAttribute('d', d);
+            ghost.setAttribute('fill', 'none');
+            ghost.setAttribute('stroke', '#E8E4DD');
+            ghost.setAttribute('stroke-width', '1');
+            ghost.setAttribute('stroke-opacity', '0.4');
+            svgEl.appendChild(ghost);
+
+            // Animated path
+            pathAnim = document.createElementNS(ns, 'path');
+            pathAnim.setAttribute('d', d);
+            pathAnim.setAttribute('fill', 'none');
+            pathAnim.setAttribute('stroke', '#8888A0');
+            pathAnim.setAttribute('stroke-width', '1');
+            pathAnim.setAttribute('stroke-opacity', '0.3');
+            pathAnim.setAttribute('stroke-dasharray', pLen);
+            pathAnim.setAttribute('stroke-dashoffset', animate ? pLen : 0);
+            pathAnim.style.transition = 'stroke-dashoffset 3s cubic-bezier(0.25,0.1,0.25,1)';
+            svgEl.appendChild(pathAnim);
+
+            // Dots
+            positions.forEach((p, i) => {
+                const col = jmColors[jmStops[i].world];
+                const g = document.createElementNS(ns, 'g');
+                const glow = document.createElementNS(ns, 'circle');
+                glow.setAttribute('cx', p.x); glow.setAttribute('cy', p.y);
+                glow.setAttribute('r', '0'); glow.setAttribute('fill', 'none');
+                glow.setAttribute('stroke', col); glow.setAttribute('stroke-width', '1');
+                glow.setAttribute('stroke-opacity', '0');
+                glow.style.transition = 'all 0.4s ease';
+                g.appendChild(glow); glows.push(glow);
+
+                const circle = document.createElementNS(ns, 'circle');
+                circle.setAttribute('cx', p.x); circle.setAttribute('cy', p.y);
+                circle.setAttribute('r', '5'); circle.setAttribute('fill', '#F8F5F0');
+                circle.setAttribute('stroke', col); circle.setAttribute('stroke-width', '1.5');
+                circle.style.transition = 'all 0.3s ease';
+                g.appendChild(circle); circles.push(circle);
+
+                const inner = document.createElementNS(ns, 'circle');
+                inner.setAttribute('cx', p.x); inner.setAttribute('cy', p.y);
+                inner.setAttribute('r', '0'); inner.setAttribute('fill', '#F8F5F0');
+                inner.setAttribute('fill-opacity', '0');
+                inner.style.transition = 'all 0.3s ease';
+                g.appendChild(inner); inners.push(inner);
+
+                svgEl.appendChild(g);
+            });
+
+            // Labels & hitboxes
+            positions.forEach((p, i) => {
+                const s = jmStops[i];
+                const col = jmColors[s.world];
+                const side = p.x > cx ? 'left' : 'right';
+                const isLeft = side === 'left';
+
+                // Label
+                const lbl = document.createElement('div');
+                lbl.className = 'jm-label jm-label--' + side;
+                lbl.style.top = (p.y - 20) + 'px';
+                lbl.style.transitionDelay = (0.3 + i * 0.08) + 's, ' + (0.3 + i * 0.08) + 's';
+
+                // Top row
+                const top = document.createElement('div');
+                top.className = 'jm-label-top';
+
+                const yearEl = document.createElement('span');
+                yearEl.className = 'jm-year';
+                yearEl.textContent = s.year;
+
+                const worldEl = document.createElement('span');
+                worldEl.className = 'jm-world';
+                worldEl.textContent = s.world;
+                worldEl.style.color = col;
+                worldEl.style.backgroundColor = col + '08';
+
+                if (isLeft) { top.appendChild(worldEl); top.appendChild(yearEl); }
+                else { top.appendChild(yearEl); top.appendChild(worldEl); }
+                lbl.appendChild(top);
+
+                const titleEl = document.createElement('div');
+                titleEl.className = 'jm-title';
+                titleEl.textContent = s.label;
+                lbl.appendChild(titleEl);
+
+                const subEl = document.createElement('div');
+                subEl.className = 'jm-sub';
+                subEl.textContent = s.sub;
+                lbl.appendChild(subEl);
+
+                const shiftEl = document.createElement('div');
+                shiftEl.className = 'jm-shift';
+                shiftEl.textContent = s.shift;
+                lbl.appendChild(shiftEl);
+
+                // Hover on label
+                lbl.addEventListener('mouseenter', () => setHover(i));
+                lbl.addEventListener('mouseleave', () => setHover(null));
+
+                mapDiv.appendChild(lbl);
+                labels.push(lbl);
+
+                // Hitbox over dot
+                const hb = document.createElement('div');
+                hb.className = 'jm-hitbox';
+                hb.style.left = (p.x - 20) + 'px';
+                hb.style.top = (p.y - 20) + 'px';
+                hb.addEventListener('mouseenter', () => setHover(i));
+                hb.addEventListener('mouseleave', () => setHover(null));
+                hb.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    setHover(hoveredIdx === i ? null : i);
+                }, { passive: false });
+                mapDiv.appendChild(hb);
+                hitboxes.push(hb);
+            });
+
+            // Footer
+            const uniqueWorlds = [...new Set(jmStops.map(s => s.world))];
+            const years = parseInt(jmStops[jmStops.length-1].year) - parseInt(jmStops[0].year);
+            const footer = document.createElement('div');
+            footer.className = 'jm-footer';
+            footer.innerHTML =
+                '<div class="jm-footer-row">' +
+                    '<span class="jm-stat">' + uniqueWorlds.length + ' mondi · ' + years + ' anni</span>' +
+                    '<span class="jm-tagline">Contesti diversi, lo stesso sguardo.</span>' +
+                '</div>';
+            container.appendChild(footer);
+
+            // Animate in
+            if (animate) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        pathAnim.setAttribute('stroke-dashoffset', '0');
+                        labels.forEach(l => l.classList.add('visible'));
+                    });
+                });
+                // Pulse ring on first dot after path animation
+                setTimeout(() => {
+                    const p0 = positions[0];
+                    const col = jmColors[jmStops[0].world];
+                    const ns = 'http://www.w3.org/2000/svg';
+                    const pulse = document.createElementNS(ns, 'circle');
+                    pulse.setAttribute('cx', p0.x);
+                    pulse.setAttribute('cy', p0.y);
+                    pulse.setAttribute('fill', 'none');
+                    pulse.setAttribute('stroke', col);
+                    pulse.setAttribute('stroke-width', '1.5');
+                    const animR = document.createElementNS(ns, 'animate');
+                    animR.setAttribute('attributeName', 'r');
+                    animR.setAttribute('values', '8;20;8');
+                    animR.setAttribute('dur', '1.8s');
+                    animR.setAttribute('repeatCount', '3');
+                    pulse.appendChild(animR);
+                    const animO = document.createElementNS(ns, 'animate');
+                    animO.setAttribute('attributeName', 'stroke-opacity');
+                    animO.setAttribute('values', '0.6;0;0.6');
+                    animO.setAttribute('dur', '1.8s');
+                    animO.setAttribute('repeatCount', '3');
+                    pulse.appendChild(animO);
+                    svgEl.appendChild(pulse);
+                }, 3500);
+            } else {
+                labels.forEach(l => l.classList.add('visible'));
+            }
+        }
+
+        // Render immediately (no accordion, standalone)
+        render(true);
+
+        // Resize handler
+        if (window.ResizeObserver) {
+            new ResizeObserver(() => { render(false); }).observe(container);
+        }
+
+        // Touch: deselect on outside tap
+        document.addEventListener('touchstart', function(e) {
+            if (hoveredIdx !== null && !e.target.closest('.jm-hitbox') && !e.target.closest('.jm-label')) {
+                setHover(null);
+            }
+        });
+    });
+    </script>
+</body>
+</html>
