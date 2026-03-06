@@ -131,14 +131,14 @@
             { year:"2004", world:"Management", label:"Master HR", sub:"Ernst & Young Business School", shift:"Imparare a parlare la lingua di chi decide" },
             { year:"2005", world:"Terzo settore", label:"MCL — Movimento Cristiano Lavoratori", sub:"Leadership nazionale · fino alla Vicepresidenza", shift:"Dalla teoria alla costruzione di reti vere, con persone vere" },
             { year:"2007", world:"Europa", label:"Conferenze internazionali", sub:"EZA · Varsavia, Porto, Bruxelles", shift:"Tre lingue, cinque paesi, un tavolo" },
-            { year:"2009", world:"Formazione", label:"Formatore — Università Cattolica", sub:"15 edizioni di alta formazione", shift:"Da dirigente a chi forma altri dirigenti" },
+            { year:"2009", world:"Formazione", label:"MCL e Università Cattolica", sub:"15 edizioni di alta formazione insieme", shift:"Terzo settore e accademia insieme. Per formare chi guiderà" },
             { year:"2010", world:"Ricerca", label:"PhD Economia del Lavoro", sub:"Fondazione Marco Biagi, Modena", shift:"Dall'azione al pensiero sistematico su quello che fai" },
             { year:"2010", world:"Letteratura", label:"Primo libro di poesia", sub:"Senza mai fermarsi", shift:"Stesso anno del PhD. La stessa persona, due lingue che escono insieme" },
             { year:"2020", world:"Voce", label:"Podcast", sub:"3 format · 50+ episodi", shift:"Dalla parola scritta alla parola detta" },
             { year:"2022", world:"Educazione", label:"Direzione scolastica", sub:"Istituto San Giuseppe, Verona", shift:"Tutto il bagaglio in un posto dove nessuno può restare indietro" },
             { year:"2024", world:"AI + Musica", label:"The Neural Gut Project", sub:"Poesia + AI + musica", shift:"La macchina diventa interlocutore. Nasce un modo nuovo di creare" },
             { year:"2025", world:"Coaching", label:"Coach ICF-AICP", sub:"Professional Coaching Program", shift:"Venticinque anni di pratica trovano un nome e un metodo" },
-            { year:"2026", world:"Coaching", label:"AI Trainer · Ricercatore", sub:"Fondazione Tarantelli · Freelance", shift:"Il viaggio continua. Tre fronti aperti, una mappa" },
+            { year:"2026", world:"Coaching", label:"AI Trainer · Ricercatore", sub:"Fondazione Tarantelli · Freelance", shift:"I fili che correvano paralleli, adesso si intrecciano" },
         ];
         const jmColors = {
             "Diplomazia":"#9B8A4A","Accademia":"#5A6B8B","Management":"#6E8B5A",
@@ -156,7 +156,7 @@
             const mobile = w < 480;
             const cx = mobile ? w * 0.18 : w * 0.5;
             const amp = mobile ? w * 0.06 : w * 0.12;
-            const rowH = mobile ? 105 : 115;
+            const rowH = mobile ? 118 : 115;
             const startY = 30;
             return jmStops.map((_, i) => {
                 const ph = i * 0.85;
@@ -347,8 +347,12 @@
                 shiftEl.textContent = s.shift;
                 lbl.appendChild(shiftEl);
 
-                // Hover on label
+                // Hover on label (+ touch)
                 lbl.addEventListener('mouseenter', () => setHover(i));
+                lbl.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    setHover(hoveredIdx === i ? null : i);
+                }, { passive: false });
                 lbl.addEventListener('mouseleave', () => setHover(null));
 
                 mapDiv.appendChild(lbl);
